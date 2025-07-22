@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model YourCard {
+  id          String   @id @default(cuid())
+  title       String
+  playerName  String
+  brand       String
+  year        Int
+  cardNumber  String
+  category    String
+  condition   String
+  grade       String
+  price       Float
+  imageUrl    String
+  isSold      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model FlipCard {
+  id              String   @id @default(cuid())
+  senderName      String
+  trackingCode    String
+  originalCard    String
+  flipFeePaid     Boolean  @default(false)
+  currentStatus   String   @default("pending")
+  finalCardValue  Float?
+  flipHistory     String?
+  videoUrl        String?
+  createdAt       DateTime @default(now())
+}
+
+model AddOn {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  type        String
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  stripeSessionId String   @unique
+  email           String
+  amount          Int
+  createdAt       DateTime @default(now())
+}

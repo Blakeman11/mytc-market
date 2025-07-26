@@ -1,12 +1,13 @@
+// src/app/admin/cards/[id]/edit/page.tsx
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import EditCardForm from "@/components/EditCardForm";
 
-export default async function EditCardPage({
-  params,
-}: {
+type Props = {
   params: { id: string };
-}) {
+};
+
+export default async function EditCardPage({ params }: Props) {
   const card = await prisma.yourCard.findUnique({ where: { id: params.id } });
 
   if (!card) return notFound();

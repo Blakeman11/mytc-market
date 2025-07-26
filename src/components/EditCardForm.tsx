@@ -2,64 +2,46 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ImageUploader from "@/components/ui/ImageUploader";
 
-export default function EditCardForm({ card }: { card: any }) {
+interface Card {
+  id: string;
+  title: string;
+  playerName: string;
+  brand: string;
+  year: number;
+  cardNumber: string;
+  category: string;
+  condition: string;
+  grade: string;
+  variant: string;
+  price: number;
+  imageUrl?: string;
+}
+
+export default function EditCardForm({ card }: { card: Card }) {
   const router = useRouter();
 
-  const [form, setForm] = useState({
-    title: card.title || "",
-    playerName: card.playerName || "",
-    brand: card.brand || "",
-    year: card.year || 2024,
-    cardNumber: card.cardNumber || "",
-    category: card.category || "",
-    condition: card.condition || "",
-    grade: card.grade || "",
-    variant: card.variant || "",
-    price: card.price || 0,
+  const [form, setForm] = useState<Card>({
+    ...card,
     imageUrl: card.imageUrl || "",
   });
 
-  const [uploading, setUploading] = useState(false);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch("/api/upload-card-image", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-    if (res.ok && data.url) {
-      setForm((prev) => ({ ...prev, imageUrl: data.url }));
-    } else {
-      alert("Image upload failed.");
-    }
-    setUploading(false);
+    const { name, value, type } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "number" ? Number(value) : value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    Object.entries(form).forEach(([key, value]) => {
-      formData.append(key, value.toString());
-    });
-
     const res = await fetch(`/api/admin/cards/${card.id}`, {
       method: "PUT",
-      body: formData,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
     });
 
     if (res.ok) {
@@ -104,7 +86,7 @@ export default function EditCardForm({ card }: { card: any }) {
           key={field}
           name={field}
           type={field === "year" || field === "price" ? "number" : "text"}
-          value={form[field as keyof typeof form]}
+          value={form[field as keyof Card] as string | number}
           onChange={handleChange}
           placeholder={field}
           className="w-full p-2 border rounded"
@@ -120,13 +102,11 @@ export default function EditCardForm({ card }: { card: any }) {
             className="h-32 w-auto object-contain mb-2 rounded shadow"
           />
         )}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="w-full"
+        <ImageUploader
+          onUploadComplete={(url) =>
+            setForm((prev) => ({ ...prev, imageUrl: url }))
+          }
         />
-        {uploading && <p className="text-sm text-gray-500 mt-1">Uploading image...</p>}
       </div>
 
       <div className="flex gap-4">

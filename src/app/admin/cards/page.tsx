@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
 export default async function AdminCardsPage() {
-  const cards = await prisma.yourCard.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const cards = await prisma.marketCard.findMany({
+  orderBy: { createdAt: "desc" },
+});
 
   return (
     <main className="max-w-4xl mx-auto p-6">

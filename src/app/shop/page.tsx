@@ -3,16 +3,25 @@
 import { useEffect, useState } from "react";
 import { useCart } from "@/context/CartContext";
 
+interface Card {
+  id: string;
+  title: string;
+  playerName: string;
+  year: number;
+  price: number;
+  imageUrl?: string;
+}
+
 export default function ShopPage() {
-  const [allCards, setAllCards] = useState<any[]>([]);
-  const [displayedCards, setDisplayedCards] = useState<any[]>([]);
+  const [allCards, setAllCards] = useState<Card[]>([]);
+  const [displayedCards, setDisplayedCards] = useState<Card[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { addToCart } = useCart();
 
   useEffect(() => {
     fetch("/api/shop")
       .then((res) => res.json())
-      .then((data) => {
+      .then((data: Card[]) => {
         setAllCards(data);
         setDisplayedCards(data);
       });
@@ -88,7 +97,7 @@ export default function ShopPage() {
                   id: card.id,
                   title: card.title,
                   price: card.price,
-                  imageUrl: card.imageUrl,
+                  imageUrl: card.imageUrl ?? "",
                 })
               }
               className="mt-auto bg-black text-white text-sm px-3 py-1 rounded hover:bg-gray-800"

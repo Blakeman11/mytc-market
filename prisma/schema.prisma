@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model YourCard {
+model MarketCard {
   id          String   @id @default(cuid())
   title       String
   playerName  String
@@ -17,7 +17,7 @@ model YourCard {
   category    String
   condition   String
   grade       String
-  variant     String?  // <-- NEW
+  variant     String?
   price       Float
   imageUrl    String
   isSold      Boolean  @default(false)

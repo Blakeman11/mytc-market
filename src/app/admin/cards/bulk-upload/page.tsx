@@ -1,24 +1,42 @@
 // src/app/admin/cards/bulk-upload/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UploadDropzone } from "@/utils/uploadthing";
 import Papa from "papaparse";
 
+type CardCSV = {
+  title: string;
+  playerName: string;
+  brand: string;
+  year: string;
+  cardNumber: string;
+  category: string;
+  condition: string;
+  grade: string;
+  price: string;
+  imageKey: string;
+};
+
+type UploadedFile = {
+  name: string;
+  url: string;
+};
+
 export default function BulkUploadPage() {
-  const [csvData, setCsvData] = useState<any[]>([]);
+  const [csvData, setCsvData] = useState<CardCSV[]>([]);
   const [imageMap, setImageMap] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handleCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCSV = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    Papa.parse(file, {
+    Papa.parse<CardCSV>(file, {
       header: true,
       complete: (results) => {
         setCsvData(results.data);
@@ -67,7 +85,7 @@ export default function BulkUploadPage() {
         <Label>Upload Images</Label>
         <UploadDropzone
           endpoint="cardImageUploader"
-          onClientUploadComplete={(res: any[]) => {
+          onClientUploadComplete={(res: UploadedFile[]) => {
             const newMap = { ...imageMap };
             res.forEach((file) => {
               const fileName = file.name.split(".")[0];
@@ -75,7 +93,9 @@ export default function BulkUploadPage() {
             });
             setImageMap(newMap);
           }}
-          onUploadError={(err: { message: string; }) => alert("Upload error: " + err.message)}
+          onUploadError={(err: { message: string }) =>
+            alert("Upload error: " + err.message)
+          }
         />
       </div>
 

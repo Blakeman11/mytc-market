@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
   const data = await req.json();
 
   try {
-    const created = await prisma.yourCard.create({
+    const created = await prisma.marketCard.create({
       data,
     });
 

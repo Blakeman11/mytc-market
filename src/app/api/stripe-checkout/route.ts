@@ -3,24 +3,30 @@ import Stripe from "stripe";
 import { NextResponse } from "next/server";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-06-30.basil",
+  apiVersion: "2022-11-15", // Use stable version, or update to "latest" if you want
 });
 
+type CartItem = {
+  title: string;
+  price: number;
+  imageUrl?: string;
+};
+
 export async function POST(req: Request) {
-  const { cart } = await req.json();
+  const { cart }: { cart: CartItem[] } = await req.json();
 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
-      line_items: cart.map((item: any) => ({
+      line_items: cart.map((item) => ({
         price_data: {
           currency: "usd",
           product_data: {
             name: item.title,
             images: item.imageUrl ? [item.imageUrl] : [],
           },
-          unit_amount: Math.round(item.price * 100), // Stripe needs cents
+          unit_amount: Math.round(item.price * 100),
         },
         quantity: 1,
       })),
@@ -31,6 +37,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ checkoutUrl: session.url });
   } catch (err) {
     console.error("Stripe error:", err);
-    return NextResponse.json({ error: "Stripe session creation failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Stripe session creation failed" },
+      { status: 500 }
+    );
   }
 }

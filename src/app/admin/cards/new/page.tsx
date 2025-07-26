@@ -8,10 +8,24 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import ImageUploader from "@/components/ui/ImageUploader";
 
+type CardForm = {
+  title: string;
+  playerName: string;
+  brand: string;
+  year: number;
+  cardNumber: string;
+  category: string;
+  condition: string;
+  grade: string;
+  price: number;
+  imageUrl: string;
+  isSold: boolean;
+};
+
 export default function NewCardPage() {
   const router = useRouter();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<CardForm>({
     title: "",
     playerName: "",
     brand: "",
@@ -25,11 +39,13 @@ export default function NewCardPage() {
     isSold: false,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : type === "number" ? Number(value) : value,
     }));
   };
 
@@ -47,48 +63,34 @@ export default function NewCardPage() {
     <main className="max-w-2xl mx-auto p-6 space-y-4">
       <h1 className="text-xl font-bold">Add New Card</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <Label>Title</Label>
-          <Input name="title" value={form.title} onChange={handleChange} />
-        </div>
-        <div>
-          <Label>Player Name</Label>
-          <Input name="playerName" value={form.playerName} onChange={handleChange} />
-        </div>
-        <div>
-          <Label>Brand</Label>
-          <Input name="brand" value={form.brand} onChange={handleChange} />
-        </div>
-        <div>
-          <Label>Year</Label>
-          <Input type="number" name="year" value={form.year} onChange={handleChange} />
-        </div>
-        <div>
-          <Label>Card Number</Label>
-          <Input name="cardNumber" value={form.cardNumber} onChange={handleChange} />
-        </div>
-        <div>
-          <Label>Category</Label>
-          <Input name="category" value={form.category} onChange={handleChange} />
-        </div>
-        <div>
-          <Label>Condition</Label>
-          <Input name="condition" value={form.condition} onChange={handleChange} />
-        </div>
-        <div>
-          <Label>Grade</Label>
-          <Input name="grade" value={form.grade} onChange={handleChange} />
-        </div>
-        <div>
-          <Label>Price</Label>
-          <Input type="number" name="price" value={form.price} onChange={handleChange} />
-        </div>
+        {[
+          { label: "Title", name: "title" },
+          { label: "Player Name", name: "playerName" },
+          { label: "Brand", name: "brand" },
+          { label: "Year", name: "year", type: "number" },
+          { label: "Card Number", name: "cardNumber" },
+          { label: "Category", name: "category" },
+          { label: "Condition", name: "condition" },
+          { label: "Grade", name: "grade" },
+          { label: "Price", name: "price", type: "number" },
+        ].map(({ label, name, type }) => (
+          <div key={name}>
+            <Label>{label}</Label>
+            <Input
+  name={name}
+  type={type || "text"}
+  value={form[name as keyof CardForm] as string | number}
+  onChange={handleChange}
+/>
+          </div>
+        ))}
+
         <div>
           <Label>Upload Image</Label>
           <ImageUploader
-            onUploadComplete={(url) => {
-              setForm((prev) => ({ ...prev, imageUrl: url }));
-            }}
+            onUploadComplete={(url) =>
+              setForm((prev) => ({ ...prev, imageUrl: url }))
+            }
           />
           {form.imageUrl && (
             <img
@@ -98,6 +100,7 @@ export default function NewCardPage() {
             />
           )}
         </div>
+
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -107,6 +110,7 @@ export default function NewCardPage() {
           />
           <Label htmlFor="isSold">Mark as Sold</Label>
         </div>
+
         <Button type="submit">Create Card</Button>
       </form>
     </main>

@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       imageUrl,
     } = body;
 
-    const newCard = await prisma.yourCard.create({
+    const newCard = await prisma.marketCard.create({
       data: {
         title,
         playerName,

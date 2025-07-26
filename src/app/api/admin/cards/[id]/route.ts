@@ -12,7 +12,7 @@ export async function GET(
     return NextResponse.json({ error: "Missing card ID" }, { status: 400 });
   }
 
-  const card = await prisma.yourCard.findUnique({
+  const card = await prisma.marketCard.findUnique({
     where: { id },
   });
 
@@ -37,7 +37,7 @@ export async function PUT(
   const data = await req.json();
 
   try {
-    const updated = await prisma.yourCard.update({
+    const updated = await prisma.marketCard.update({
       where: { id },
       data,
     });

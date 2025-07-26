@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { YourCard } from "@prisma/client";
+import { MarketCard } from "@prisma/client"; // 🔄 renamed model
 import ImageUploader from "@/components/ui/ImageUploader";
 
 export default function EditCardPage() {
@@ -14,7 +14,7 @@ export default function EditCardPage() {
   const params = useParams();
   const id = params?.id as string;
 
-  const [card, setCard] = useState<YourCard | null>(null);
+  const [card, setCard] = useState<MarketCard | null>(null); // 🔄 renamed type
   const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
@@ -26,31 +26,32 @@ export default function EditCardPage() {
     category: "",
     condition: "",
     grade: "",
+    variant: "",
     price: 0,
     imageUrl: "",
     isSold: false,
   });
 
   useEffect(() => {
-  if (!id) return;
+    if (!id) return;
 
-  fetch(`/api/admin/cards/${id}`)
-    .then((res) => res.json())
-    .then((data) => {
-      if (!data || !data.title) {
-        console.error("Card not found or missing fields:", data);
+    fetch(`/api/admin/cards/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data || !data.title) {
+          console.error("Card not found or missing fields:", data);
+          setLoading(false);
+          return;
+        }
+        setCard(data);
+        setForm(data);
         setLoading(false);
-        return;
-      }
-      setCard(data);
-      setForm(data);
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.error("Fetch error:", err);
-      setLoading(false);
-    });
-}, [id]);
+      })
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        setLoading(false);
+      });
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type, checked } = e.target;
@@ -107,6 +108,10 @@ export default function EditCardPage() {
         <div>
           <Label>Grade</Label>
           <Input name="grade" value={form.grade} onChange={handleChange} />
+        </div>
+        <div>
+          <Label>Variant</Label>
+          <Input name="variant" value={form.variant} onChange={handleChange} />
         </div>
         <div>
           <Label>Price</Label>

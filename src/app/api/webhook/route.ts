@@ -1,9 +1,10 @@
+// src/app/api/webhook/route.ts
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-06-30.basil",
+  apiVersion: "2022-11-15",
 });
 
 export async function POST(req: NextRequest) {
@@ -18,9 +19,10 @@ export async function POST(req: NextRequest) {
       sig,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
-  } catch (err: any) {
-    console.error("❌ Webhook signature verification failed:", err.message);
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+  } catch (err) {
+    const error = err as Error;
+    console.error("❌ Webhook signature verification failed:", error.message);
+    return new Response(`Webhook Error: ${error.message}`, { status: 400 });
   }
 
   if (event.type === "checkout.session.completed") {
@@ -30,8 +32,8 @@ export async function POST(req: NextRequest) {
       await prisma.order.create({
         data: {
           stripeSessionId: session.id,
-          email: session.customer_details?.email || "",
-          amount: session.amount_total || 0,
+          email: session.customer_details?.email ?? "",
+          amount: session.amount_total ?? 0,
         },
       });
 

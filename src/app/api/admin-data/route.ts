@@ -6,7 +6,7 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
-  const cards = await prisma.yourCard.findMany({
+  const cards = await prisma.marketCard.findMany({
     orderBy: { createdAt: "desc" },
   });
 

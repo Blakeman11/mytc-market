@@ -17,6 +17,7 @@ model YourCard {
   category    String
   condition   String
   grade       String
+  variant     String?  // <-- NEW
   price       Float
   imageUrl    String
   isSold      Boolean  @default(false)

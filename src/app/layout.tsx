@@ -1,13 +1,12 @@
+// app/layout.tsx
 import "./globals.css";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { CartProvider } from "@/context/CartContext"; // adjust path if needed
 import Header from "@/components/ui/header";
-
-const inter = Inter({ subsets: ["latin"] });
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "MYTC Market",
-  description: "Buy singles, flip cards, and connect with collectors.",
+  description: "Buy and flip cards with collectors",
 };
 
 export default function RootLayout({
@@ -17,9 +16,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Header />
-        <main>{children}</main>
+      <body>
+        <CartProvider>
+          <Header />
+          {children}
+        </CartProvider>
       </body>
     </html>
   );

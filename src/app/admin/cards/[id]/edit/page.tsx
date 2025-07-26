@@ -3,12 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import EditCardForm from "@/components/EditCardForm";
 
-type Props = {
+export default async function EditCardPage({
+  params,
+}: {
   params: { id: string };
-};
-
-export default async function EditCardPage({ params }: Props) {
-  const card = await prisma.yourCard.findUnique({ where: { id: params.id } });
+}) {
+  const card = await prisma.yourCard.findUnique({
+    where: { id: params.id },
+  });
 
   if (!card) return notFound();
 

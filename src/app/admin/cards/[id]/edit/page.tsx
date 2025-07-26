@@ -1,3 +1,9 @@
+// src/app/admin/cards/[id]/edit/page.tsx
+
+import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
+import EditCardForm from "@/components/EditCardForm"; // ✅ THIS IS THE FIX
+
 export default async function EditCardPage({
   params,
 }: {

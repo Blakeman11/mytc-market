@@ -1,7 +1,7 @@
-// app/layout.tsx
 import "./globals.css";
-import { CartProvider } from "@/context/CartContext"; // adjust path if needed
+import { CartProvider } from "@/context/CartContext";
 import Header from "@/components/ui/header";
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -15,13 +15,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <CartProvider>
-          <Header />
-          {children}
-        </CartProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body>
+          <CartProvider>
+            <Header />
+            {children}
+          </CartProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

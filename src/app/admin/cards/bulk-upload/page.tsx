@@ -84,7 +84,7 @@ export default function BulkUploadPage() {
       <div>
         <Label>Upload Images</Label>
         <UploadDropzone
-          endpoint="cardImageUploader"
+          endpoint="imageUploader" 
           onClientUploadComplete={(res: UploadedFile[]) => {
             const newMap = { ...imageMap };
             res.forEach((file) => {

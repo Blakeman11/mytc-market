@@ -1,50 +1,33 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ApiError } from "@/lib/api-error";
+import { handleApiRoute } from "@/lib/handle-api";
 
 // GET /api/admin/cards/[id]
-export async function GET(
-  _req: NextRequest,
-  context: { params: { id: string } }
-) {
+export const GET = handleApiRoute(async (_req, context: { params: { id: string } }) => {
   const { id } = context.params;
 
-  if (!id) {
-    return NextResponse.json({ error: "Missing card ID" }, { status: 400 });
-  }
+  if (!id) throw new ApiError(400, "Missing card ID");
 
-  const card = await prisma.marketCard.findUnique({
-    where: { id },
-  });
+  const card = await prisma.marketCard.findUnique({ where: { id } });
 
-  if (!card) {
-    return NextResponse.json({ error: "Card not found" }, { status: 404 });
-  }
+  if (!card) throw new ApiError(404, "Card not found");
 
-  return NextResponse.json(card);
-}
+  return new Response(JSON.stringify(card), { status: 200 });
+});
 
 // PUT /api/admin/cards/[id]
-export async function PUT(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+export const PUT = handleApiRoute(async (req: NextRequest, context: { params: { id: string } }) => {
   const { id } = context.params;
 
-  if (!id) {
-    return NextResponse.json({ error: "Missing card ID" }, { status: 400 });
-  }
+  if (!id) throw new ApiError(400, "Missing card ID");
 
   const data = await req.json();
 
-  try {
-    const updated = await prisma.marketCard.update({
-      where: { id },
-      data,
-    });
+  const updated = await prisma.marketCard.update({
+    where: { id },
+    data,
+  });
 
-    return NextResponse.json(updated);
-  } catch (error) {
-    console.error("Failed to update card:", error);
-    return NextResponse.json({ error: "Failed to update card" }, { status: 500 });
-  }
-}
+  return new Response(JSON.stringify(updated), { status: 200 });
+});

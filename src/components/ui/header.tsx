@@ -3,6 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+} from "@clerk/nextjs";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,10 +21,22 @@ export default function Header() {
       </Link>
 
       {/* Desktop nav */}
-      <nav className="hidden md:flex space-x-6 text-sm font-medium">
+      <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
         <Link href="/shop" className="hover:underline">Shop</Link>
         <Link href="/flip-my-card" className="hover:underline">Flip My Card</Link>
         <Link href="/chat" className="hover:underline">Chat</Link>
+
+        <SignedOut>
+          <SignInButton mode="modal">
+            <button className="bg-blue-600 text-white px-3 py-1 rounded">
+              Sign In
+            </button>
+          </SignInButton>
+        </SignedOut>
+
+        <SignedIn>
+          <UserButton afterSignOutUrl="/" />
+        </SignedIn>
       </nav>
 
       {/* Mobile hamburger */}
@@ -36,6 +54,23 @@ export default function Header() {
           <Link href="/shop" onClick={() => setMenuOpen(false)}>Shop</Link>
           <Link href="/flip-my-card" onClick={() => setMenuOpen(false)}>Flip My Card</Link>
           <Link href="/chat" onClick={() => setMenuOpen(false)}>Chat</Link>
+
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button
+                className="bg-blue-600 text-white px-3 py-1 rounded mt-2 text-left"
+                onClick={() => setMenuOpen(false)}
+              >
+                Sign In
+              </button>
+            </SignInButton>
+          </SignedOut>
+
+          <SignedIn>
+            <div className="mt-2">
+              <UserButton afterSignOutUrl="/" />
+            </div>
+          </SignedIn>
         </div>
       )}
     </header>

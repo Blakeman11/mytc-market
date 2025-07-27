@@ -29,7 +29,7 @@ export default function NewCardPage() {
     title: "",
     playerName: "",
     brand: "",
-    year: 2024,
+    year: new Date().getFullYear(),
     cardNumber: "",
     category: "",
     condition: "",
@@ -42,46 +42,70 @@ export default function NewCardPage() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : type === "number" ? Number(value) : value,
-    }));
+    const { name, value, type } = e.target;
+
+    if (type === "checkbox") {
+      const checkbox = e.target as HTMLInputElement;
+      setForm((prev) => ({
+        ...prev,
+        [name]: checkbox.checked,
+      }));
+    } else if (type === "number") {
+      setForm((prev) => ({
+        ...prev,
+        [name]: Number(value),
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch("/api/admin/cards", {
+
+    const res = await fetch("/api/admin/cards", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    router.push("/admin/cards");
+
+    if (res.ok) {
+      router.push("/admin/cards");
+    } else {
+      const error = await res.json();
+      alert("Failed to submit: " + error.message);
+    }
   };
 
   return (
     <main className="max-w-2xl mx-auto p-6 space-y-4">
       <h1 className="text-xl font-bold">Add New Card</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {[
-          { label: "Title", name: "title" },
-          { label: "Player Name", name: "playerName" },
-          { label: "Brand", name: "brand" },
-          { label: "Year", name: "year", type: "number" },
-          { label: "Card Number", name: "cardNumber" },
-          { label: "Category", name: "category" },
-          { label: "Condition", name: "condition" },
-          { label: "Grade", name: "grade" },
-          { label: "Price", name: "price", type: "number" },
-        ].map(({ label, name, type }) => (
+        {(
+          [
+            { label: "Title", name: "title" },
+            { label: "Player Name", name: "playerName" },
+            { label: "Brand", name: "brand" },
+            { label: "Year", name: "year", type: "number" },
+            { label: "Card Number", name: "cardNumber" },
+            { label: "Category", name: "category" },
+            { label: "Condition", name: "condition" },
+            { label: "Grade", name: "grade" },
+            { label: "Price", name: "price", type: "number" },
+          ] as const
+        ).map(({ label, name, type }) => (
           <div key={name}>
-            <Label>{label}</Label>
+            <Label htmlFor={name}>{label}</Label>
             <Input
-  name={name}
-  type={type || "text"}
-  value={form[name as keyof CardForm] as string | number}
-  onChange={handleChange}
-/>
+              name={name}
+              id={name}
+              type={type || "text"}
+              value={form[name]}
+              onChange={handleChange}
+            />
           </div>
         ))}
 
@@ -105,6 +129,7 @@ export default function NewCardPage() {
           <input
             type="checkbox"
             name="isSold"
+            id="isSold"
             checked={form.isSold}
             onChange={handleChange}
           />

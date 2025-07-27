@@ -1,3 +1,4 @@
+// src/app/admin/cards/[id]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MarketCard } from "@prisma/client"; // 🔄 renamed model
+import { MarketCard } from "@prisma/client";
 import ImageUploader from "@/components/ui/ImageUploader";
 
 export default function EditCardPage() {
@@ -14,7 +15,7 @@ export default function EditCardPage() {
   const params = useParams();
   const id = params?.id as string;
 
-  const [card, setCard] = useState<MarketCard | null>(null); // 🔄 renamed type
+  const [card, setCard] = useState<MarketCard | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
@@ -53,13 +54,29 @@ export default function EditCardPage() {
       });
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => {
+  const { name, value, type } = e.target;
+
+  if (type === "checkbox") {
+    const checkbox = e.target as HTMLInputElement;
     setForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: checkbox.checked,
     }));
-  };
+  } else if (type === "number") {
+    setForm((prev) => ({
+      ...prev,
+      [name]: Number(value),
+    }));
+  } else {
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

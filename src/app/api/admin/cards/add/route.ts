@@ -1,43 +1,43 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ApiError } from "@/lib/api-error";
+import { handleApiRoute } from "@/lib/handle-api";
 
-export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-    const {
+export const POST = handleApiRoute(async (req: Request) => {
+  const body = await req.json();
+  const {
+    title,
+    playerName,
+    brand,
+    year,
+    cardNumber,
+    category,
+    condition,
+    grade,
+    variant,
+    price,
+    imageUrl,
+  } = body;
+
+  if (!title || !playerName || !brand || !year || !price) {
+    throw new ApiError(400, "Missing required fields");
+  }
+
+  const newCard = await prisma.marketCard.create({
+    data: {
       title,
       playerName,
       brand,
-      year,
+      year: parseInt(year),
       cardNumber,
       category,
       condition,
       grade,
       variant,
-      price,
+      price: parseFloat(price),
       imageUrl,
-    } = body;
+      isSold: false,
+    },
+  });
 
-    const newCard = await prisma.marketCard.create({
-      data: {
-        title,
-        playerName,
-        brand,
-        year: parseInt(year),
-        cardNumber,
-        category,
-        condition,
-        grade,
-        variant,
-        price: parseFloat(price),
-        imageUrl,
-        isSold: false,
-      },
-    });
-
-    return NextResponse.json(newCard, { status: 201 });
-  } catch (error) {
-    console.error("Add Card Error:", error);
-    return NextResponse.json({ error: "Something went wrong." }, { status: 500 });
-  }
-}
+  return new Response(JSON.stringify(newCard), { status: 201 });
+});

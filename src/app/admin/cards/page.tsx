@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { MarketCard } from "@prisma/client";
 
 export default async function AdminCardsPage() {
-  const cards = await prisma.marketCard.findMany({
-  orderBy: { createdAt: "desc" },
-});
+  const cards: MarketCard[] = await prisma.marketCard.findMany({
+    orderBy: { createdAt: "desc" },
+  });
 
   return (
     <main className="max-w-4xl mx-auto p-6">
@@ -28,7 +29,10 @@ export default async function AdminCardsPage() {
       ) : (
         <ul className="space-y-4">
           {cards.map((card) => (
-            <li key={card.id} className="border rounded p-4 flex items-center justify-between">
+            <li
+              key={card.id}
+              className="border rounded p-4 flex items-center justify-between"
+            >
               <div className="flex items-center gap-4">
                 {card.imageUrl && (
                   <Image
@@ -44,11 +48,15 @@ export default async function AdminCardsPage() {
                   <div className="text-sm text-muted-foreground">
                     {card.playerName} — {card.year}
                   </div>
-                  <div className="text-sm font-medium">${card.price.toFixed(2)}</div>
+                  <div className="text-sm font-medium">
+                    ${card.price.toFixed(2)}
+                  </div>
                 </div>
               </div>
               <Link href={`/admin/cards/${card.id}/edit`}>
-                <Button variant="outline" size="sm">Edit</Button>
+                <Button variant="outline" size="sm">
+                  Edit
+                </Button>
               </Link>
             </li>
           ))}

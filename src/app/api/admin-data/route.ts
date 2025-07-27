@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiRoute } from "@/lib/handle-api";
 
-export async function GET() {
+export const GET = handleApiRoute(async () => {
   const flips = await prisma.flipCard.findMany({
     orderBy: { createdAt: "desc" },
   });
@@ -10,5 +10,5 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json({ flips, cards });
-}
+  return new Response(JSON.stringify({ flips, cards }), { status: 200 });
+});

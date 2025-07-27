@@ -1,17 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ApiError } from "@/lib/api-error";
+import { handleApiRoute } from "@/lib/handle-api";
 
-export async function POST(req: NextRequest) {
+export const POST = handleApiRoute(async (req: Request) => {
   const data = await req.json();
 
-  try {
-    const created = await prisma.marketCard.create({
-      data,
-    });
-
-    return NextResponse.json(created, { status: 201 });
-  } catch (error) {
-    console.error("Failed to create card:", error);
-    return NextResponse.json({ error: "Failed to create card" }, { status: 500 });
+  if (!data || !data.title || !data.playerName || !data.price) {
+    throw new ApiError(400, "Missing required fields: title, playerName, price");
   }
-}
+
+  const created = await prisma.marketCard.create({
+    data,
+  });
+
+  return new Response(JSON.stringify(created), { status: 201 });
+});

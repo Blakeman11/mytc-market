@@ -14,7 +14,7 @@ interface Card {
   category: string;
   condition: string;
   grade: string;
-  variant: string;
+  variant?: string | null;
   price: number;
   imageUrl?: string;
 }
@@ -27,7 +27,9 @@ export default function EditCardForm({ card }: { card: Card }) {
     imageUrl: card.imageUrl || "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, value, type } = e.target;
     setForm((prev) => ({
       ...prev,
@@ -53,8 +55,7 @@ export default function EditCardForm({ card }: { card: Card }) {
   };
 
   const handleDelete = async () => {
-    const confirmDelete = confirm("Are you sure you want to delete this card?");
-    if (!confirmDelete) return;
+    if (!confirm("Are you sure you want to delete this card?")) return;
 
     const res = await fetch(`/api/admin/cards/${card.id}`, {
       method: "DELETE",
@@ -70,23 +71,25 @@ export default function EditCardForm({ card }: { card: Card }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {[
-        "title",
-        "playerName",
-        "year",
-        "brand",
-        "cardNumber",
-        "category",
-        "condition",
-        "grade",
-        "variant",
-        "price",
-      ].map((field) => (
+      {(
+        [
+          "title",
+          "playerName",
+          "year",
+          "brand",
+          "cardNumber",
+          "category",
+          "condition",
+          "grade",
+          "variant",
+          "price",
+        ] as const
+      ).map((field) => (
         <input
           key={field}
           name={field}
           type={field === "year" || field === "price" ? "number" : "text"}
-          value={form[field as keyof Card] as string | number}
+          value={form[field]}
           onChange={handleChange}
           placeholder={field}
           className="w-full p-2 border rounded"
@@ -116,7 +119,6 @@ export default function EditCardForm({ card }: { card: Card }) {
         >
           Save Changes
         </button>
-
         <button
           type="button"
           onClick={handleDelete}

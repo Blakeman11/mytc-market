@@ -3,9 +3,24 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+type CardFormData = {
+  title: string
+  playerName: string
+  brand: string
+  year: string
+  cardNumber: string
+  category: string
+  condition: string
+  grade: string
+  variant: string
+  price: string
+  imageUrl: string
+}
+
 export default function AddCardPage() {
   const router = useRouter()
-  const [formData, setFormData] = useState({
+
+  const [formData, setFormData] = useState<CardFormData>({
     title: '',
     playerName: '',
     brand: '',
@@ -19,8 +34,14 @@ export default function AddCardPage() {
     imageUrl: '',
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,12 +70,12 @@ export default function AddCardPage() {
     <div className="max-w-xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Add a New Card</h1>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
-        {Object.keys(formData).map((key) => (
+        {(Object.keys(formData) as (keyof CardFormData)[]).map((key) => (
           <input
             key={key}
             type="text"
             name={key}
-            value={formData[key as keyof typeof formData]}
+            value={formData[key]}
             onChange={handleChange}
             placeholder={key}
             className="p-2 border rounded"

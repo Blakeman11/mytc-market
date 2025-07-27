@@ -1,18 +1,25 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ApiError } from "@/lib/api-error";
+import { handleApiRoute } from "@/lib/handle-api";
 
-export async function POST(req: Request) {
+export const POST = handleApiRoute(async (req: Request) => {
   const body = await req.json();
+
+  const { senderName, trackingCode, originalCard } = body;
+
+  if (!senderName || !trackingCode || !originalCard) {
+    throw new ApiError(400, "Missing required flip fields");
+  }
 
   const flip = await prisma.flipCard.create({
     data: {
-      senderName: body.senderName,
-      trackingCode: body.trackingCode,
-      originalCard: body.originalCard,
+      senderName,
+      trackingCode,
+      originalCard,
       flipFeePaid: false,
       currentStatus: "pending",
     },
   });
 
-  return NextResponse.json(flip);
-}
+  return new Response(JSON.stringify(flip), { status: 201 });
+});

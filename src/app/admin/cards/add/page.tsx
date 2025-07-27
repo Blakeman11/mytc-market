@@ -34,9 +34,25 @@ export default function AddCardPage() {
     imageUrl: '',
   })
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const fields: {
+    label: string
+    name: keyof CardFormData
+    type?: string
+  }[] = [
+    { label: 'Title', name: 'title' },
+    { label: 'Player Name', name: 'playerName' },
+    { label: 'Brand', name: 'brand' },
+    { label: 'Year', name: 'year', type: 'number' },
+    { label: 'Card Number', name: 'cardNumber' },
+    { label: 'Category', name: 'category' },
+    { label: 'Condition', name: 'condition' },
+    { label: 'Grade', name: 'grade' },
+    { label: 'Variant', name: 'variant' },
+    { label: 'Price', name: 'price', type: 'number' },
+    { label: 'Image URL', name: 'imageUrl' },
+  ]
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
@@ -70,14 +86,14 @@ export default function AddCardPage() {
     <div className="max-w-xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Add a New Card</h1>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
-        {(Object.keys(formData) as (keyof CardFormData)[]).map((key) => (
+        {fields.map(({ label, name, type = 'text' }) => (
           <input
-            key={key}
-            type="text"
-            name={key}
-            value={formData[key]}
+            key={name}
+            type={type}
+            name={name}
+            value={formData[name]}
             onChange={handleChange}
-            placeholder={key}
+            placeholder={label}
             className="p-2 border rounded"
             required
           />
